@@ -1,11 +1,14 @@
 import sys
 import os
-from flask import Flask
+import json
+from flask import Flask, jsonify
 from flask_restful import Api
 from api.views import UserResource
 from admin.routes import admin_blueprint
 from database import db, create_database
 from login import login_bp
+from flask_swagger_ui import get_swaggerui_blueprint
+
 # Get the absolute path to the directory containing main.py
 project_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -22,8 +25,24 @@ app.register_blueprint(login_bp)
 api = Api(app)
 api.add_resource(UserResource, '/users/', '/users/<int:user_id>')
 
+# Serve Swagger UI
+SWAGGER_URL = '/swagger'
+API_URL = '/swagger.json'
 
 
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "jwt_auth_app"
+    }
+)
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+@app.route('/swagger.json')
+def swagger():
+    with open('swagger.json', 'r') as f:
+        return jsonify(json.load(f))
 
 
 if __name__ == '__main__':
