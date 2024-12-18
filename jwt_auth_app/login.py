@@ -9,7 +9,7 @@ login_bp = Blueprint('login', __name__)
 def login():
     username = request.json.get('username')
     password = request.json.get('password')
-    print(username)
+    # print(username)
     # Query the database to find the user
     user = User.query.filter_by(email=username).first()
     if not user:
